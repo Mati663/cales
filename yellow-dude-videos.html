@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yellow Dude — Calisthenics Coach</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f4f0;
+    --bg-tertiary: #eceae3;
+    --text: #1a1a18;
+    --text-secondary: #5f5e5a;
+    --text-tertiary: #888780;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.2);
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+
+    --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-200: #EF9F27;
+    --amber-400: #EF9F27; --amber-600: #BA7517; --amber-800: #633806;
+    --teal-50: #E1F5EE; --teal-200: #5DCAA5; --teal-400: #1D9E75;
+    --teal-600: #0F6E56; --teal-800: #085041;
+    --coral-50: #FAECE7; --coral-200: #F0997B; --coral-400: #D85A30;
+    --coral-600: #993C1D; --coral-800: #712B13;
+    --purple-50: #EEEDFE; --purple-400: #7F77DD; --purple-600: #534AB7; --purple-800: #26215C;
+    --gray-50: #F1EFE8; --gray-100: #D3D1C7; --gray-400: #888780;
+    --gray-600: #5F5E5A; --gray-800: #2C2C2A;
+    --blue-50: #E6F1FB; --blue-400: #378ADD; --blue-600: #185FA5; --blue-800: #042C53;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg-secondary: #242422; --bg-tertiary: #2c2c2a;
+      --text: #f0ede6; --text-secondary: #a8a59e; --text-tertiary: #6e6c67;
+      --border: rgba(255,255,255,0.1); --border-md: rgba(255,255,255,0.18);
+      --amber-50: #2a1f08; --amber-800: #FAC775;
+      --teal-50: #071a12; --teal-800: #9FE1CB;
+      --coral-50: #1f0e07; --coral-800: #F0997B;
+      --purple-50: #150f2e; --purple-800: #AFA9EC;
+      --gray-50: #242422; --blue-50: #07182a; --blue-800: #85B7EB;
+    }
+  }
+
+  body {
+    font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-tertiary);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* LAYOUT */
+  .app-shell { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 220px; min-width: 220px; background: var(--bg);
+    border-right: 0.5px solid var(--border);
+    display: flex; flex-direction: column;
+    padding: 0; position: sticky; top: 0; height: 100vh;
+  }
+  .main { flex: 1; overflow-y: auto; }
+  .content { max-width: 720px; margin: 0 auto; padding: 2rem 2rem 4rem; }
+
+  /* SIDEBAR */
+  .sidebar-header { padding: 1.5rem 1.25rem 1rem; border-bottom: 0.5px solid var(--border); }
+  .logo-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .logo {
+    width: 32px; height: 32px; border-radius: var(--radius-md);
+    background: var(--amber-200); display: flex; align-items: center;
+    justify-content: center; font-size: 14px; font-weight: 700; color: var(--amber-800);
+  }
+  .app-name { font-size: 15px; font-weight: 600; }
+  .app-sub { font-size: 11px; color: var(--text-tertiary); }
+  .nav { padding: 0.75rem 0.75rem; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+    border-radius: var(--radius-md); cursor: pointer; font-size: 13px;
+    color: var(--text-secondary); margin-bottom: 2px; transition: all 0.12s;
+    border: none; background: transparent; width: 100%; text-align: left;
+  }
+  .nav-item:hover { background: var(--bg-secondary); color: var(--text); }
+  .nav-item.active { background: var(--bg-secondary); color: var(--text); font-weight: 500; }
+  .nav-icon { width: 16px; height: 16px; opacity: 0.6; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 1rem 1.25rem; border-top: 0.5px solid var(--border); }
+  .level-summary { display: flex; flex-direction: column; gap: 6px; }
+  .level-row-sm { display: flex; align-items: center; justify-content: space-between; }
+  .level-label { font-size: 11px; color: var(--text-tertiary); }
+  .mini-dots { display: flex; gap: 2px; }
+  .mini-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-md); }
+  .mini-dot.push { background: var(--amber-200); }
+  .mini-dot.pull { background: var(--teal-400); }
+  .mini-dot.squat { background: var(--coral-400); }
+
+  /* SECTION */
+  .section { display: none; }
+  .section.active { display: block; }
+  .section-title { font-size: 22px; font-weight: 600; margin-bottom: 0.25rem; }
+  .section-sub { font-size: 14px; color: var(--text-secondary); margin-bottom: 1.75rem; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg); padding: 1.25rem; margin-bottom: 1rem;
+  }
+  .card-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 0.5px solid var(--border);
+  }
+  .card-title { font-size: 14px; font-weight: 500; }
+
+  /* BADGES */
+  .badge { display: inline-block; padding: 2px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-push { background: var(--amber-50); color: var(--amber-600); }
+  .badge-pull { background: var(--teal-50); color: var(--teal-600); }
+  .badge-squat { background: var(--coral-50); color: var(--coral-600); }
+  .badge-neutral { background: var(--gray-50); color: var(--gray-600); }
+  .badge-info { background: var(--blue-50); color: var(--blue-600); }
+
+  /* FORMS */
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+  .field-label { font-size: 12px; color: var(--text-secondary); }
+  input[type="number"], input[type="text"], input[type="date"], select, textarea {
+    padding: 8px 10px; border: 0.5px solid var(--border-md); border-radius: var(--radius-md);
+    background: var(--bg); color: var(--text); font-size: 13px;
+    font-family: inherit; outline: none; transition: border 0.1s;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--amber-200); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  /* BUTTONS */
+  .btn {
+    padding: 9px 18px; border-radius: var(--radius-md); font-size: 13px;
+    font-weight: 500; cursor: pointer; font-family: inherit; transition: all 0.12s;
+    border: none;
+  }
+  .btn-primary { background: var(--text); color: var(--bg); }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary {
+    background: transparent; color: var(--text);
+    border: 0.5px solid var(--border-md);
+  }
+  .btn-secondary:hover { background: var(--bg-secondary); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+  .btn-row { display: flex; gap: 8px; margin-top: 1rem; flex-wrap: wrap; }
+
+  /* Q OPTIONS */
+  .q-opts { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  .q-opt {
+    padding: 5px 13px; border: 0.5px solid var(--border-md); border-radius: 20px;
+    font-size: 12px; cursor: pointer; background: var(--bg); color: var(--text);
+    transition: all 0.1s; font-family: inherit;
+  }
+  .q-opt:hover { background: var(--bg-secondary); }
+  .q-opt.active { border-color: var(--amber-200); background: var(--amber-50); color: var(--amber-800); }
+  .q-group { margin-bottom: 1rem; }
+  .q-label { font-size: 13px; color: var(--text-secondary); }
+
+  /* METRICS */
+  .metric-card {
+    background: var(--bg-secondary); border-radius: var(--radius-md);
+    padding: 1rem; text-align: center;
+  }
+  .metric-val { font-size: 26px; font-weight: 600; line-height: 1; }
+  .metric-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 4px; }
+
+  /* TABLES */
+  .ex-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .ex-table th {
+    padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 400;
+    color: var(--text-tertiary); border-bottom: 0.5px solid var(--border);
+    background: var(--bg-secondary);
+  }
+  .ex-table td { padding: 10px 12px; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+  .ex-table tr:last-child td { border-bottom: none; }
+  .ex-name { font-weight: 500; font-size: 13px; }
+  .ex-note { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+  .btn-video { display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500; background: var(--red-50); color: var(--red-600); border: 0.5px solid var(--border-md); text-decoration: none; cursor: pointer; }
+  .btn-video:hover { opacity: 0.8; }
+  --red-50: #FCEBEB; --red-600: #A32D2D;
+
+  /* LEVEL DOTS */
+  .dots { display: flex; gap: 4px; align-items: center; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border-md); }
+  .dot.push { background: var(--amber-200); }
+  .dot.pull { background: var(--teal-400); }
+  .dot.squat { background: var(--coral-400); }
+
+  /* PROGRESS BARS */
+  .bar-wrap { margin-bottom: 14px; }
+  .bar-meta { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
+  .bar-meta span:first-child { color: var(--text-secondary); }
+  .bar-meta span:last-child { font-weight: 500; }
+  .bar-track { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+  .bar-push { background: var(--amber-200); }
+  .bar-pull { background: var(--teal-400); }
+  .bar-squat { background: var(--coral-400); }
+
+  /* SCHEDULE */
+  .schedule-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 10px; }
+  .day-col { text-align: center; }
+  .day-name { font-size: 10px; color: var(--text-tertiary); margin-bottom: 4px; }
+  .day-pill { padding: 5px 2px; border-radius: 6px; font-size: 10px; font-weight: 500; }
+  .day-rest { background: var(--bg-secondary); color: var(--text-tertiary); }
+  .day-push { background: var(--amber-50); color: var(--amber-800); }
+  .day-pull { background: var(--teal-50); color: var(--teal-800); }
+  .day-squat { background: var(--coral-50); color: var(--coral-800); }
+  .day-all { background: var(--purple-50); color: var(--purple-800); font-size: 9px; }
+
+  /* SESSION HISTORY */
+  .session-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: var(--bg); border: 0.5px solid var(--border);
+    border-radius: var(--radius-md); margin-bottom: 6px;
+  }
+  .session-date { font-size: 12px; color: var(--text-tertiary); }
+  .session-notes { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+  .session-badges { display: flex; gap: 4px; }
+
+  /* TIPS */
+  .tip { background: var(--amber-50); border: 0.5px solid var(--amber-100); border-radius: var(--radius-md); padding: 10px 14px; font-size: 13px; color: var(--amber-800); margin-top: 10px; }
+
+  /* EMPTY */
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--text-tertiary); font-size: 14px; }
+
+  /* DIVIDER */
+  .divider { height: 0.5px; background: var(--border); margin: 1rem 0; }
+
+  /* RESULT BOX */
+  .result-box { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 1rem; }
+  .result-row { display: flex; align-items: center; justify-content: space-between; padding: 9px 0; border-bottom: 0.5px solid var(--border); }
+  .result-row:last-child { border-bottom: none; }
+  .result-name { font-size: 14px; font-weight: 500; }
+  .result-desc { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+
+  /* CONFIRM */
+  .confirm-item { font-size: 13px; color: var(--text-secondary); padding: 7px 0; border-bottom: 0.5px solid var(--border); display: flex; gap: 8px; align-items: flex-start; }
+  .confirm-item:last-child { border-bottom: none; }
+
+  .phase-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 12px; background: var(--bg-secondary);
+    border-bottom: 0.5px solid var(--border); border-top: 0.5px solid var(--border); margin: 0;
+  }
+  .phase-title { font-size: 13px; font-weight: 500; }
+
+  /* CRITERIA */
+  .criteria-item { font-size: 13px; color: var(--text-secondary); padding: 6px 0; border-bottom: 0.5px solid var(--border); display: flex; gap: 8px; }
+  .criteria-item:last-child { border-bottom: none; }
+  .arrow { color: var(--amber-200); font-weight: 600; flex-shrink: 0; }
+
+  /* CHECK */
+  .check-group { display: flex; flex-direction: column; gap: 8px; }
+  .check-item { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; }
+
+  .imc-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; margin-top: 4px; }
+  .imc-normal { background: var(--teal-50); color: var(--teal-600); }
+  .imc-bajo { background: var(--purple-50); color: var(--purple-600); }
+  .imc-sobre { background: var(--amber-50); color: var(--amber-600); }
+  .imc-ob { background: var(--coral-50); color: var(--coral-600); }
+
+  .adj-item { font-size: 13px; color: var(--text-secondary); padding: 5px 0; border-bottom: 0.5px solid var(--border); display: flex; gap: 8px; }
+  .adj-item:last-child { border-bottom: none; }
+  .adj-dot { color: var(--amber-200); flex-shrink: 0; }
+
+  @media (max-width: 640px) {
+    .app-shell { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; height: auto; position: static; flex-direction: row; align-items: center; }
+    .sidebar-header { display: none; }
+    .nav { display: flex; flex-direction: row; padding: 0.5rem; overflow-x: auto; }
+    .nav-item { white-space: nowrap; }
+    .sidebar-footer { display: none; }
+    .content { padding: 1rem 1rem 3rem; }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .schedule-grid { gap: 3px; }
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo-row">
+        <div class="logo">YD</div>
+        <div>
+          <div class="app-name">Yellow Dude</div>
+          <div class="app-sub">Calisthenics Playbook</div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-item active" onclick="switchTab('perfil')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="5" r="3"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        Perfil
+      </button>
+      <button class="nav-item" onclick="switchTab('test')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4h10M3 8h7M3 12h5"/><circle cx="13" cy="11" r="2.5"/><path d="M13 9.5V8"/></svg>
+        Test de nivel
+      </button>
+      <button class="nav-item" onclick="switchTab('rutina')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M5 5h6M5 11h3"/></svg>
+        Rutina
+      </button>
+      <button class="nav-item" onclick="switchTab('progreso')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12l4-4 3 3 5-6"/></svg>
+        Progreso
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em">Niveles</div>
+      <div class="level-summary">
+        <div class="level-row-sm">
+          <span class="level-label">Push</span>
+          <div class="mini-dots" id="sidebar-push-dots"></div>
+        </div>
+        <div class="level-row-sm">
+          <span class="level-label">Pull</span>
+          <div class="mini-dots" id="sidebar-pull-dots"></div>
+        </div>
+        <div class="level-row-sm">
+          <span class="level-label">Squat</span>
+          <div class="mini-dots" id="sidebar-squat-dots"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="content">
+
+      <!-- PERFIL -->
+      <div class="section active" id="tab-perfil">
+        <div class="section-title">Tu perfil</div>
+        <div class="section-sub">Ingresa tus datos para personalizar la rutina y ajustes</div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Datos físicos</span></div>
+          <div class="grid-3" style="margin-bottom:1rem">
+            <div class="field-group">
+              <span class="field-label">Peso (kg)</span>
+              <input type="number" id="peso" placeholder="75" min="30" max="250" oninput="updateProfile()">
+            </div>
+            <div class="field-group">
+              <span class="field-label">Altura (cm)</span>
+              <input type="number" id="altura" placeholder="175" min="130" max="230" oninput="updateProfile()">
+            </div>
+            <div class="field-group">
+              <span class="field-label">Edad</span>
+              <input type="number" id="edad" placeholder="28" min="10" max="90" oninput="updateProfile()">
+            </div>
+          </div>
+        </div>
+
+        <div id="profile-metrics" style="display:none">
+          <div class="grid-3" style="margin-bottom:1rem">
+            <div class="metric-card">
+              <div class="metric-val" id="imc-val">—</div>
+              <div class="metric-sub">IMC</div>
+              <div id="imc-badge" style="margin-top:6px"></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val" id="peso-ideal-val">—</div>
+              <div class="metric-sub">Peso ideal estimado</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-val" id="edad-cat-val">—</div>
+              <div class="metric-sub">Categoría edad</div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Ajustes aplicados a tu entrenamiento</span></div>
+            <div id="adj-list"></div>
+          </div>
+        </div>
+        <div id="profile-empty" class="empty">Ingresa tu peso y altura para ver tu perfil y ajustes</div>
+      </div>
+
+      <!-- TEST -->
+      <div class="section" id="tab-test">
+        <div class="section-title">Test de nivel</div>
+        <div class="section-sub">Responde las preguntas para que te asignemos el nivel correcto en cada pilar</div>
+
+        <div id="test-phase1">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Push</span><span class="badge badge-push">Objetivo: One-Arm Push-Up</span></div>
+            <div class="q-group">
+              <div class="q-label">¿Puedes mantener una plancha 30s sin que la cadera caiga?</div>
+              <div class="q-opts">
+                <button class="q-opt" onclick="pick(this,'plank','si')">Sí, sin problema</button>
+                <button class="q-opt" onclick="pick(this,'plank','casi')">Casi / me tiembla</button>
+                <button class="q-opt" onclick="pick(this,'plank','no')">No aún</button>
+              </div>
+            </div>
+            <div class="q-group">
+              <div class="q-label">¿Cuántas push-ups normales seguidas con buena forma?</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+                <input type="number" id="pushup-count" placeholder="0" min="0" max="100" style="width:80px">
+                <span style="font-size:13px;color:var(--text-tertiary)">repeticiones</span>
+              </div>
+            </div>
+            <div class="q-group">
+              <div class="q-label">¿Has probado las archer push-ups?</div>
+              <div class="q-opts">
+                <button class="q-opt" onclick="pick(this,'archer','si')">Sí, puedo</button>
+                <button class="q-opt" onclick="pick(this,'archer','pocas')">Pocas / difícil</button>
+                <button class="q-opt" onclick="pick(this,'archer','no')">No / nunca intenté</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">Pull</span><span class="badge badge-pull">Objetivo: Pull-Up</span></div>
+            <div class="q-group">
+              <div class="q-label">¿Tienes acceso a una barra de dominadas?</div>
+              <div class="q-opts">
+                <button class="q-opt" onclick="pick(this,'barra','si')">Sí</button>
+                <button class="q-opt" onclick="pick(this,'barra','no')">No</button>
+              </div>
+            </div>
+            <div class="q-group">
+              <div class="q-label">¿Puedes colgarte pasivamente 30 segundos?</div>
+              <div class="q-opts">
+                <button class="q-opt" onclick="pick(this,'hang','si')">Sí</button>
+                <button class="q-opt" onclick="pick(this,'hang','menos')">Menos de 30s</button>
+                <button class="q-opt" onclick="pick(this,'hang','no')">No tengo barra</button>
+              </div>
+            </div>
+            <div class="q-group">
+              <div class="q-label">¿Cuántos Australian pull-ups (fila horizontal) puedes hacer?</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+                <input type="number" id="australian-count" placeholder="0" min="0" max="50" style="width:80px">
+                <span style="font-size:13px;color:var(--text-tertiary)">repeticiones</span>
+              </div>
+            </div>
+            <div class="q-group">
+              <div class="q-label">¿Has logrado alguna vez un pull-up completo?</div>
+              <div class="q-opts">
+                <button class="q-opt" onclick="pick(this,'pullup','si')">Sí, varios</button>
+                <button class="q-opt" onclick="pick(this,'pullup','uno')">1 o 2</button>
+                <button class="q-opt" onclick="pick(this,'pullup','no')">Todavía no</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header"><span class="card-title">Squat</span><span class="badge badge-squat">Objetivo: Pistol Squat</span></div>
+            <div class="q-group">
+              <div class="q-label">¿Sentadilla profunda (caderas bajo rodillas) con talones en el piso?</div>
+              <div class="q-opts">
+                <button class="q-opt" onclick="pick(this,'deepsquat','si')">Sí, fluida</button>
+                <button class="q-opt" onclick="pick(this,'deepsquat','casi')">Con dificultad</button>
+                <button class="q-opt" onclick="pick(this,'deepsquat','no')">No llego</button>
+              </div>
+            </div>
+            <div class="q-group">
+              <div class="q-label">¿Bulgarian split squats? ¿Cuántas por pierna?</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+                <input type="number" id="bulgarian-count" placeholder="0" min="0" max="50" style="width:80px">
+                <span style="font-size:13px;color:var(--text-tertiary)">reps por pierna</span>
+              </div>
+            </div>
+            <div class="q-group">
+              <div class="q-label">¿Has probado Cossack squats?</div>
+              <div class="q-opts">
+                <button class="q-opt" onclick="pick(this,'cossack','si')">Sí, puedo</button>
+                <button class="q-opt" onclick="pick(this,'cossack','dificil')">Muy difícil</button>
+                <button class="q-opt" onclick="pick(this,'cossack','no')">No</button>
+              </div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="calcLevel()">Calcular mi nivel</button>
+          </div>
+        </div>
+
+        <div id="test-phase2" style="display:none">
+          <div class="card">
+            <div class="card-header"><span class="card-title">Resultado del test</span></div>
+            <div class="result-box">
+              <div class="result-row">
+                <div><div class="result-name">Push</div><div class="result-desc" id="push-desc"></div></div>
+                <div style="display:flex;align-items:center;gap:8px"><div class="dots" id="push-dots"></div><span style="font-size:12px;font-weight:500" id="push-lvl-txt"></span></div>
+              </div>
+              <div class="result-row">
+                <div><div class="result-name">Pull</div><div class="result-desc" id="pull-desc"></div></div>
+                <div style="display:flex;align-items:center;gap:8px"><div class="dots" id="pull-dots"></div><span style="font-size:12px;font-weight:500" id="pull-lvl-txt"></span></div>
+              </div>
+              <div class="result-row">
+                <div><div class="result-name">Squat</div><div class="result-desc" id="squat-desc"></div></div>
+                <div style="display:flex;align-items:center;gap:8px"><div class="dots" id="squat-dots"></div><span style="font-size:12px;font-weight:500" id="squat-lvl-txt"></span></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Ejercicios de confirmacion</span><span class="badge badge-neutral">Fase 2</span></div>
+            <div id="confirm-exercises"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="saveAndGoRoutine()">Guardar y ver mi rutina</button>
+            <button class="btn btn-secondary" onclick="resetTest()">Repetir test</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RUTINA -->
+      <div class="section" id="tab-rutina">
+        <div class="section-title">Rutina</div>
+        <div class="section-sub">Tu entrenamiento personalizado según el Calisthenics Playbook</div>
+        <div id="routine-no-level" class="empty">
+          Completa el test de nivel primero<br><br>
+          <button class="btn btn-secondary" onclick="switchTab('test')">Ir al test</button>
+        </div>
+        <div id="routine-content" style="display:none">
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="field-group">
+              <span class="field-label">Pilar</span>
+              <select id="pillar-select" onchange="renderRoutine()">
+                <option value="push">Push — One-Arm Push-Up</option>
+                <option value="pull">Pull — Pull-Up</option>
+                <option value="squat">Squat — Pistol Squat</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <span class="field-label">Método semanal</span>
+              <select id="method-select" onchange="renderRoutine()">
+                <option value="stacking">Stacking (~90 min)</option>
+                <option value="one">Un día, una rutina</option>
+                <option value="triplet">Tripletas (~45 min)</option>
+              </select>
+            </div>
+          </div>
+          <div id="routine-output"></div>
+        </div>
+      </div>
+
+      <!-- PROGRESO -->
+      <div class="section" id="tab-progreso">
+        <div class="section-title">Progreso</div>
+        <div class="section-sub">Registra tus sesiones y sigue tu avance</div>
+        <div class="grid-3" style="margin-bottom:1rem">
+          <div class="metric-card"><div class="metric-val" id="stat-sessions">0</div><div class="metric-sub">Sesiones totales</div></div>
+          <div class="metric-card"><div class="metric-val" id="stat-streak">0</div><div class="metric-sub">Racha (días)</div></div>
+          <div class="metric-card"><div class="metric-val" id="stat-volume">0</div><div class="metric-sub">Pilares entrenados</div></div>
+        </div>
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-header"><span class="card-title">Progresión de niveles</span></div>
+          <div class="bar-wrap"><div class="bar-meta"><span>Push</span><span id="bar-push-txt">—</span></div><div class="bar-track"><div class="bar-fill bar-push" id="bar-push" style="width:0%"></div></div></div>
+          <div class="bar-wrap"><div class="bar-meta"><span>Pull</span><span id="bar-pull-txt">—</span></div><div class="bar-track"><div class="bar-fill bar-pull" id="bar-pull" style="width:0%"></div></div></div>
+          <div class="bar-wrap" style="margin-bottom:0"><div class="bar-meta"><span>Squat</span><span id="bar-squat-txt">—</span></div><div class="bar-track"><div class="bar-fill bar-squat" id="bar-squat" style="width:0%"></div></div></div>
+        </div>
+        <div class="card" style="margin-bottom:1rem">
+          <div class="card-header"><span class="card-title">Registrar sesión</span></div>
+          <div class="grid-2" style="margin-bottom:1rem">
+            <div class="field-group">
+              <span class="field-label">Fecha</span>
+              <input type="date" id="session-date">
+            </div>
+            <div class="field-group">
+              <span class="field-label">Pilares trabajados</span>
+              <div class="check-group" style="margin-top:4px">
+                <label class="check-item"><input type="checkbox" id="log-push"> Push</label>
+                <label class="check-item"><input type="checkbox" id="log-pull"> Pull</label>
+                <label class="check-item"><input type="checkbox" id="log-squat"> Squat</label>
+              </div>
+            </div>
+          </div>
+          <div class="field-group" style="margin-bottom:1rem">
+            <span class="field-label">Notas (opcional)</span>
+            <textarea id="session-notes" rows="2" placeholder="Ej: push-ups se sintieron bien, subí a 4 sets" style="width:100%;resize:none;margin-top:4px"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="logSession()">Registrar sesión</button>
+        </div>
+        <div>
+          <div style="font-size:13px;font-weight:500;margin-bottom:10px">Historial</div>
+          <div id="sessions-history"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+const STORAGE_KEY = 'yellow-dude-v1';
+let state = { levels: null, sessions: [], profile: {} };
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) state = JSON.parse(saved);
+  } catch(e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+const ROUTINES = {
+  push: {
+    1: { warmup: [
+        { ex: 'Rotación de muñecas', sets: 1, reps: '30s c/lado', tempo: '—', rest: '—', note: 'Círculos amplios, ambas manos' },
+        { ex: 'Extensión de muñecas en el piso', sets: 1, reps: '20s', tempo: '—', rest: '—', note: 'Palmas planas, dedos hacia atrás' },
+        { ex: 'Scapula push-ups', sets: 2, reps: '10', tempo: '1010', rest: '30s', note: 'Brazos rectos, activar escápulas' },
+      ], main: [
+        { ex: 'Plank hold', sets: 3, reps: '20–30s', tempo: '—', rest: '90s', note: 'Core apretado, cadera neutral' },
+        { ex: 'Scapula push-ups', sets: 3, reps: '10', tempo: '1010', rest: '90s', note: 'Desde plank, escápulas en T invertida' },
+        { ex: 'Negative push-ups', sets: 3, reps: '5', tempo: '5010', rest: '120s', note: 'Bajar en 5s controlado' },
+      ], criteria: 'Lograr 8 reps controladas de negative push-ups (5s de bajada) → Nivel 2'
+    },
+    2: { warmup: [
+        { ex: 'Círculos de hombros', sets: 1, reps: '10+10', tempo: '—', rest: '—', note: 'Adelante y atrás, amplios' },
+        { ex: 'Scapula push-ups', sets: 2, reps: '10', tempo: '1010', rest: '30s', note: 'Activar escápulas completamente' },
+        { ex: 'Plank hold ligero', sets: 1, reps: '20s', tempo: '—', rest: '—', note: 'Solo activar core y hombros' },
+      ], main: [
+        { ex: 'Normal push-ups', sets: 4, reps: '8–10', tempo: '2010', rest: '120s', note: 'Cuerpo recto, codos cerca del cuerpo' },
+        { ex: 'Wide push-ups', sets: 3, reps: '8', tempo: '2010', rest: '90s', note: 'Manos 2 palmas más anchas que hombros' },
+        { ex: 'Diamond push-ups', sets: 3, reps: '8', tempo: '2010', rest: '90s', note: 'Manos en diamante bajo el pecho' },
+      ], criteria: 'Lograr 12 reps de push-ups normales con buena forma → Nivel 3'
+    },
+    3: { warmup: [
+        { ex: 'Extensión de muñecas en el piso', sets: 1, reps: '30s', tempo: '—', rest: '—', note: 'Esencial antes de tricep extensions' },
+        { ex: 'Scapula push-ups', sets: 2, reps: '10', tempo: '1010', rest: '30s', note: 'Activación completa' },
+        { ex: 'Normal push-ups suaves', sets: 1, reps: '8', tempo: '3030', rest: '60s', note: 'Calentamiento articular' },
+      ], main: [
+        { ex: 'Tricep extensions', sets: 4, reps: '8', tempo: '2010', rest: '120s', note: 'Desde posición de codo, calentar muñecas antes' },
+        { ex: 'Explosive push-ups', sets: 3, reps: '5', tempo: '—', rest: '120s', note: 'Palmada en el aire, aterrizaje con codos flexionados' },
+        { ex: 'Normal push-ups', sets: 3, reps: '10', tempo: '2010', rest: '90s', note: 'Volumen de refuerzo' },
+      ], criteria: 'Completar sets y reps + plancha 60s → Nivel 4'
+    },
+    4: { warmup: [
+        { ex: 'Rotación de muñecas + extensión', sets: 1, reps: '45s', tempo: '—', rest: '—', note: 'Crítico en este nivel' },
+        { ex: 'Scapula push-ups', sets: 2, reps: '12', tempo: '1010', rest: '30s', note: 'Máximo rango de escápula' },
+        { ex: 'Wide push-ups', sets: 1, reps: '8', tempo: '2010', rest: '60s', note: 'Precalentar hombros' },
+      ], main: [
+        { ex: 'Archer push-ups', sets: 4, reps: '5 c/lado', tempo: '2010', rest: '180s', note: 'Brazo activo carga el peso, brazo extendido para balance' },
+        { ex: 'Wide + Diamond + Scapula (superset)', sets: 3, reps: '8+8+10', tempo: '2010', rest: '120s', note: 'Sin descanso entre ejercicios del superset' },
+      ], criteria: 'Completar todos los sets y reps → Nivel 5'
+    },
+    5: { warmup: [
+        { ex: 'Protocolo muñecas completo', sets: 1, reps: '2 min', tempo: '—', rest: '—', note: 'Rotación + extensión + círculos de hombro' },
+        { ex: 'Archer push-ups suaves', sets: 1, reps: '5 c/lado', tempo: '3020', rest: '90s', note: 'Calentamiento específico OAPU' },
+      ], main: [
+        { ex: 'One-arm push-up (OAPU)', sets: 5, reps: '2–3 c/lado', tempo: '2010', rest: '180s', note: 'Pies anchos, cadera alineada, codo al cielo. Regresión: pared → mesa → piso' },
+        { ex: 'Archer push-ups', sets: 3, reps: '6 c/lado', tempo: '2010', rest: '120s', note: 'Mantener base sólida' },
+      ], criteria: 'Aumentar reps de OAPU progresivamente. Objetivo: 5 reps limpias por lado'
+    }
+  },
+  pull: {
+    1: { warmup: [
+        { ex: 'Banded overhead pull-aparts', sets: 2, reps: '12', tempo: '—', rest: '30s', note: 'Brazos rectos, hombros abajo siempre' },
+        { ex: 'Banded horizontal pull-aparts', sets: 2, reps: '12', tempo: '—', rest: '30s', note: 'Pecho abierto, sin doblar codos' },
+        { ex: 'Banded pull-downs', sets: 2, reps: '10', tempo: '—', rest: '30s', note: 'Jalar al pecho, no inclinarse atrás' },
+      ], main: [
+        { ex: 'Passive hang', sets: 4, reps: '20–30s', tempo: '—', rest: '90s', note: 'Grip completo, todos los dedos, hombros activos' },
+        { ex: 'Scapula pull-ups', sets: 3, reps: '8', tempo: '1010', rest: '90s', note: 'Desde colgado, depresión y retracción, codos rectos' },
+        { ex: 'Australian pull-ups', sets: 3, reps: '6', tempo: '2010', rest: '90s', note: 'Barra baja o mesa, cuerpo recto como tabla' },
+      ], criteria: 'Row 30–40 kg para los sets indicados + hang 60s → Nivel 2'
+    },
+    2: { warmup: [
+        { ex: 'Banded overhead pull-aparts', sets: 2, reps: '12', tempo: '—', rest: '30s', note: 'Brazos rectos, hombros abajo' },
+        { ex: 'Banded horizontal pull-aparts', sets: 2, reps: '12', tempo: '—', rest: '30s', note: 'Pecho abierto, sin doblar codos' },
+        { ex: 'Banded pull-downs', sets: 2, reps: '10', tempo: '—', rest: '30s', note: 'Jalar al pecho, no inclinarse' },
+      ], main: [
+        { ex: 'Band assisted pull-ups (banda gruesa)', sets: 3, reps: '6', tempo: '2010', rest: '180s', note: 'Banda bajo los pies o rodillas, escápulas activas' },
+        { ex: 'Australian pull-ups', sets: 3, reps: '8', tempo: '2010', rest: '120s', note: 'Intentar posición casi horizontal' },
+        { ex: 'Scapula pull-ups + Passive hang (superset)', sets: 3, reps: '8 + 30s', tempo: '—', rest: '120s', note: 'Sin descanso entre los dos' },
+      ], criteria: 'Australian pull-ups casi horizontal en los sets indicados → Nivel 3'
+    },
+    3: { warmup: [
+        { ex: 'Banded overhead pull-aparts', sets: 2, reps: '12', tempo: '—', rest: '30s', note: 'Hombros abajo y atrás' },
+        { ex: 'Banded pull-downs', sets: 2, reps: '10', tempo: '—', rest: '30s', note: 'Simula el patrón del pull-up' },
+        { ex: 'Passive hang', sets: 1, reps: '30s', tempo: '—', rest: '60s', note: 'Preparar grip y hombros' },
+      ], main: [
+        { ex: 'Negative pull-ups', sets: 5, reps: '3', tempo: '8010', rest: '180s', note: 'Subir con impulso, bajar en 8s controlado' },
+        { ex: 'Band assisted pull-ups', sets: 3, reps: '5', tempo: '2010', rest: '180s', note: 'Banda media, escápulas activas' },
+        { ex: 'Australian pull-ups', sets: 3, reps: '10', tempo: '2010', rest: '90s', note: 'Mantener base horizontal' },
+      ], criteria: '5 series de negativos de 10s controlados → Nivel 4'
+    },
+    4: { warmup: [
+        { ex: 'Banded overhead pull-aparts', sets: 2, reps: '12', tempo: '—', rest: '30s', note: 'Brazos completamente rectos' },
+        { ex: 'Banded pull-downs', sets: 2, reps: '10', tempo: '—', rest: '30s', note: 'Máxima contracción de dorsales' },
+        { ex: 'Passive hang', sets: 2, reps: '30s', tempo: '—', rest: '60s', note: 'Grip y hombros listos' },
+      ], main: [
+        { ex: 'Band assisted pull-ups (banda fina ~10kg)', sets: 4, reps: '5', tempo: '2010', rest: '180s', note: 'Banda delgada. Si fallas, volver a banda media' },
+        { ex: 'Negative pull-ups', sets: 3, reps: '3', tempo: '10010', rest: '180s', note: 'Bajar en 10 segundos' },
+        { ex: 'Australian pull-ups', sets: 3, reps: '10', tempo: '2010', rest: '90s', note: 'Volumen accesorio' },
+      ], criteria: 'Completar sets con banda fina → intentar pull-up sin banda → Nivel 5'
+    },
+    5: { warmup: [
+        { ex: 'Banded horizontal pull-aparts', sets: 2, reps: '15', tempo: '—', rest: '30s', note: 'Activar romboides y trapecio' },
+        { ex: 'Banded pull-downs', sets: 2, reps: '10', tempo: '—', rest: '30s', note: 'Warm-up específico de pull-up' },
+        { ex: 'Passive hang', sets: 2, reps: '30s', tempo: '—', rest: '60s', note: 'Grip completo, hombros listos' },
+      ], main: [
+        { ex: 'Pull-ups', sets: 5, reps: '3', tempo: '2010', rest: '180s', note: 'Grip prono, cuerpo recto, pecho al frente al subir' },
+        { ex: 'Negative pull-ups', sets: 3, reps: '3', tempo: '8010', rest: '180s', note: 'Accesorio para ganar más volumen' },
+      ], criteria: 'Aumentar reps progresivamente: 3×5 → 3×8 → agregar peso'
+    }
+  },
+  squat: {
+    1: { warmup: [
+        { ex: 'Rotación de tobillos', sets: 1, reps: '10 c/lado', tempo: '—', rest: '—', note: 'Movilidad articular clave' },
+        { ex: 'Bodyweight squats lentos', sets: 2, reps: '10', tempo: '3030', rest: '30s', note: 'Rango completo, talones en el piso' },
+        { ex: 'Deep squat isométrico', sets: 1, reps: '30s', tempo: '—', rest: '30s', note: 'Quedarse abajo, movilizar caderas y tobillos' },
+      ], main: [
+        { ex: 'Bodyweight squats', sets: 3, reps: '15', tempo: '2010', rest: '90s', note: 'Talones en el piso, rodillas sobre pies' },
+        { ex: 'Narrow stance squats', sets: 3, reps: '12', tempo: '4141', rest: '90s', note: 'Pies juntos, 4s bajar, 1s abajo, 4s subir' },
+        { ex: 'Deep squats', sets: 3, reps: '10', tempo: '3030', rest: '90s', note: 'Caderas bajo rodillas, talones en el piso' },
+      ], criteria: 'Completar toda la rutina con buena forma → Nivel 2'
+    },
+    2: { warmup: [
+        { ex: 'Rotación de tobillos', sets: 1, reps: '10 c/lado', tempo: '—', rest: '—', note: 'Movilidad articular' },
+        { ex: 'Deep squat isométrico', sets: 2, reps: '30s', tempo: '—', rest: '30s', note: 'Movilizar caderas y tobillos' },
+        { ex: 'Bodyweight squats', sets: 2, reps: '10', tempo: '2020', rest: '30s', note: 'Activación general de piernas' },
+      ], main: [
+        { ex: 'Bulgarian split squats', sets: 4, reps: '6 c/pierna', tempo: '2010', rest: '120s', note: 'Pie trasero elevado, rodilla trasera hacia el piso' },
+        { ex: 'Deep squats', sets: 3, reps: '12', tempo: '2020', rest: '90s', note: 'Mantener talones en el piso siempre' },
+        { ex: 'Narrow stance squats', sets: 3, reps: '10', tempo: '4141', rest: '90s', note: 'Balance y control unilateral' },
+      ], criteria: '6 reps sólidas de Bulgarian split squats por pierna → Nivel 3'
+    },
+    3: { warmup: [
+        { ex: 'Rotación de tobillos + cadera', sets: 1, reps: '10 c/lado', tempo: '—', rest: '—', note: 'Movilidad doble: tobillo y cadera' },
+        { ex: 'Deep squat isométrico', sets: 2, reps: '30s', tempo: '—', rest: '30s', note: 'Preparar rango lateral' },
+        { ex: 'Bulgarian split squats suaves', sets: 1, reps: '5 c/pierna', tempo: '3020', rest: '60s', note: 'Calentamiento previo a Cossack' },
+      ], main: [
+        { ex: 'Cossack squats', sets: 4, reps: '5 c/lado', tempo: '3010', rest: '120s', note: 'Lateral, un pie extendido, otro en sentadilla profunda' },
+        { ex: 'Bulgarian split squats', sets: 3, reps: '8 c/pierna', tempo: '2010', rest: '90s', note: 'Mantener la base unilateral' },
+        { ex: 'Deep squats', sets: 3, reps: '12', tempo: '2020', rest: '90s', note: 'Volumen de movilidad' },
+      ], criteria: '6 reps de Cossack squats por lado → Nivel 4'
+    },
+    4: { warmup: [
+        { ex: 'Tobillo + cadera completo', sets: 1, reps: '2 min', tempo: '—', rest: '—', note: 'Movilidad completa antes de pistol' },
+        { ex: 'Cossack squats suaves', sets: 2, reps: '5 c/lado', tempo: '4020', rest: '60s', note: 'Calentamiento específico' },
+        { ex: 'Assisted pistol suave', sets: 1, reps: '3 c/pierna', tempo: '—', rest: '60s', note: 'Agarrarse de algo para moverse sin esfuerzo máximo' },
+      ], main: [
+        { ex: 'Assisted pistol squat', sets: 4, reps: '5 c/pierna', tempo: '2010', rest: '120s', note: 'Agarrarse de algo, bajar lo más posible' },
+        { ex: 'Eccentric pistol (4s de bajada)', sets: 3, reps: '4 c/pierna', tempo: '4010', rest: '120s', note: 'Bajar sin asistencia, subir con ambas piernas si necesario' },
+        { ex: 'Cossack squats', sets: 3, reps: '6 c/lado', tempo: '3010', rest: '90s', note: 'Mantener movilidad lateral' },
+      ], criteria: '10 reps fluidas de pistol asistido o eccentric pistol → Nivel 5'
+    },
+    5: { warmup: [
+        { ex: 'Movilidad completa de tobillo y cadera', sets: 1, reps: '2 min', tempo: '—', rest: '—', note: 'Crítico para pistol squat' },
+        { ex: 'Cossack squats', sets: 2, reps: '6 c/lado', tempo: '3010', rest: '60s', note: 'Calentamiento específico' },
+        { ex: 'Assisted pistol', sets: 1, reps: '3 c/pierna', tempo: '—', rest: '60s', note: 'Activar el patrón motor' },
+      ], main: [
+        { ex: 'Pistol squat', sets: 5, reps: '3 c/pierna', tempo: '2010', rest: '150s', note: 'Una pierna, rodilla alineada, pie elevado, bajada controlada' },
+        { ex: 'Assisted pistol (accesorio)', sets: 3, reps: '6 c/pierna', tempo: '2010', rest: '90s', note: 'Volumen adicional con asistencia mínima' },
+      ], criteria: 'Aumentar reps progresivamente. Objetivo: 8 reps por pierna'
+    }
+  }
+};
+
+const SCHEDULES = {
+  stacking: { days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], types:['all','rest','all','rest','all','rest','rest'] },
+  one: { days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], types:['push','pull','squat','push','pull','squat','rest'] },
+  triplet: { days:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], types:['all','rest','all','rest','all','rest','rest'] },
+};
+
+const testAnswers = {};
+
+function pick(el, key, val) {
+  el.closest('.q-opts').querySelectorAll('.q-opt').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  testAnswers[key] = val;
+}
+
+function calcLvlPush() {
+  const plank = testAnswers.plank, archer = testAnswers.archer;
+  const count = parseInt(document.getElementById('pushup-count').value) || 0;
+  if (!plank || plank === 'no') return { level:1, desc:'Trabajando la base — plank y scapula push-ups' };
+  if (count < 5) return { level:1, desc:'Base casi lista — enfocarse en negative push-ups' };
+  if (count < 12) return { level:2, desc:'Push-ups estándar y variaciones' };
+  if (!archer || archer === 'no' || archer === 'pocas') return { level:3, desc:'Tricep extensions y explosive push-ups' };
+  return { level:4, desc:'Archer push-ups — próximo: OAPU' };
+}
+function calcLvlPull() {
+  const hang = testAnswers.hang, pullup = testAnswers.pullup;
+  const aus = parseInt(document.getElementById('australian-count').value) || 0;
+  if (!hang || hang === 'no') return { level:1, desc:'Sin barra — trabajo con bandas y filas' };
+  if (hang === 'menos') return { level:1, desc:'Construyendo fuerza de grip y escápulas' };
+  if (pullup === 'no' && aus < 5) return { level:1, desc:'Passive hang y scapula pull-ups primero' };
+  if (pullup === 'no') return { level:2, desc:'Australian pull-ups y asistencia con banda' };
+  if (pullup === 'uno') return { level:3, desc:'Negative pull-ups para ganar fuerza excéntrica' };
+  return { level:4, desc:'Pull-ups con banda fina — casi sin asistencia' };
+}
+function calcLvlSquat() {
+  const deep = testAnswers.deepsquat, cossack = testAnswers.cossack;
+  const bul = parseInt(document.getElementById('bulgarian-count').value) || 0;
+  if (!deep || deep === 'no') return { level:1, desc:'Movilidad primero — sentadilla profunda como base' };
+  if (deep === 'casi' || bul < 6) return { level:1, desc:'Construyendo rango y estabilidad bilateral' };
+  if (bul >= 6 && (!cossack || cossack === 'no' || cossack === 'dificil')) return { level:2, desc:'Bulgarian split squats en progreso' };
+  if (cossack === 'si') return { level:3, desc:'Cossack squats — preparando el pistol' };
+  return { level:2, desc:'Progresión unilateral básica' };
+}
+
+function makeDots(n, max, type) {
+  return Array.from({length:max}, (_,i) => `<div class="dot${i<n?' '+type:''}"></div>`).join('');
+}
+function makeMiniDots(n, max, type) {
+  return Array.from({length:max}, (_,i) => `<div class="mini-dot${i<n?' '+type:''}"></div>`).join('');
+}
+
+function calcLevel() {
+  const push = calcLvlPush(), pull = calcLvlPull(), squat = calcLvlSquat();
+  state.levels = { push: push.level, pull: pull.level, squat: squat.level };
+  saveState();
+
+  document.getElementById('push-desc').textContent = push.desc;
+  document.getElementById('pull-desc').textContent = pull.desc;
+  document.getElementById('squat-desc').textContent = squat.desc;
+  document.getElementById('push-lvl-txt').textContent = `Nivel ${push.level}/5`;
+  document.getElementById('pull-lvl-txt').textContent = `Nivel ${pull.level}/5`;
+  document.getElementById('squat-lvl-txt').textContent = `Nivel ${squat.level}/5`;
+  document.getElementById('push-dots').innerHTML = makeDots(push.level, 5, 'push');
+  document.getElementById('pull-dots').innerHTML = makeDots(pull.level, 5, 'pull');
+  document.getElementById('squat-dots').innerHTML = makeDots(squat.level, 5, 'squat');
+
+  const confirms = [
+    ...(push.level<5 ? [[push.level===1?'Plank 20s + 3 scapula push-ups':push.level===2?'10 normal + 5 wide push-ups':push.level===3?'5 tricep extensions + 3 explosive push-ups':'3 archer push-ups por lado', 'push']] : []),
+    ...(pull.level<5 ? [[pull.level===1?'Passive hang 15s + 5 scapula pull-ups':pull.level===2?'5 australian pull-ups + hang 30s':pull.level===3?'3 negative pull-ups (5s cada una)':'1 pull-up asistido con banda fina', 'pull']] : []),
+    ...(squat.level<5 ? [[squat.level===1?'Deep squat isométrico 20s':squat.level===2?'5 bulgarian split squats por pierna':squat.level===3?'5 cossack squats por lado':'3 pistol asistidos por pierna', 'squat']] : []),
+  ];
+  document.getElementById('confirm-exercises').innerHTML = confirms.map(([ex, p]) =>
+    `<div class="confirm-item"><span class="badge badge-${p}">${p.charAt(0).toUpperCase()+p.slice(1)}</span> ${ex}</div>`
+  ).join('');
+
+  document.getElementById('test-phase1').style.display = 'none';
+  document.getElementById('test-phase2').style.display = 'block';
+  updateSidebarDots();
+  updateProgressBars();
+}
+
+function resetTest() {
+  document.getElementById('test-phase1').style.display = 'block';
+  document.getElementById('test-phase2').style.display = 'none';
+}
+
+function saveAndGoRoutine() {
+  if (!state.levels) return;
+  document.getElementById('routine-no-level').style.display = 'none';
+  document.getElementById('routine-content').style.display = 'block';
+  renderRoutine();
+  switchTab('rutina');
+}
+
+
+const VIDEO_MAP = {"Plank hold": "https://www.youtube.com/watch?v=pSHjTRCQxIw", "Scapula push-ups": "https://www.youtube.com/watch?v=5YHZnEsE9hA", "Negative push-ups": "https://www.youtube.com/watch?v=vyOLKo7PizM", "Normal push-ups": "https://www.youtube.com/watch?v=yvgp8R0fbWg", "Wide push-ups": "https://www.youtube.com/watch?v=yvgp8R0fbWg", "Diamond push-ups": "https://www.youtube.com/watch?v=J0DXGHy7m_8", "Tricep extensions": "https://www.youtube.com/watch?v=0RvZaZlpQGc", "Explosive push-ups": "https://www.youtube.com/watch?v=0RvZaZlpQGc", "Archer push-ups": "https://www.youtube.com/watch?v=OVRBYrjszy4", "Wide + Diamond + Scapula (superset)": "https://www.youtube.com/watch?v=0RvZaZlpQGc", "One-arm push-up (OAPU)": "https://www.youtube.com/watch?v=jiA3RnMxFU0", "Banded overhead pull-aparts": "https://www.youtube.com/watch?v=LeMk15TN0No", "Banded horizontal pull-aparts": "https://www.youtube.com/watch?v=LeMk15TN0No", "Banded pull-downs": "https://www.youtube.com/watch?v=kKXyCA7i-20", "Passive hang": "https://www.youtube.com/watch?v=kKXyCA7i-20", "Scapula pull-ups": "https://www.youtube.com/watch?v=kKXyCA7i-20", "Australian pull-ups": "https://www.youtube.com/watch?v=UaTnPqbK9ZA", "Bent Over Rows (con bandas o barra)": "https://www.youtube.com/watch?v=UaTnPqbK9ZA", "Band assisted pull-ups (banda gruesa)": "https://www.youtube.com/watch?v=kIvFkHdIpqI", "Scapula pull-ups + Passive hang (superset)": "https://www.youtube.com/watch?v=kKXyCA7i-20", "Negative pull-ups": "https://www.youtube.com/shorts/izVyydjBVBc", "Band assisted pull-ups": "https://www.youtube.com/watch?v=kIvFkHdIpqI", "Band assisted pull-ups (banda fina ~10kg)": "https://www.youtube.com/watch?v=kIvFkHdIpqI", "Pull-ups": "https://www.youtube.com/watch?v=kIvFkHdIpqI", "Rotación de tobillos": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Bodyweight squats lentos": "https://www.youtube.com/watch?v=2C-uNgKwPLE", "Deep squat isométrico": "https://www.youtube.com/watch?v=2C-uNgKwPLE", "Bodyweight squats": "https://www.youtube.com/watch?v=2C-uNgKwPLE", "Narrow stance squats": "https://www.youtube.com/watch?v=2C-uNgKwPLE", "Deep squats": "https://www.youtube.com/watch?v=2C-uNgKwPLE", "Bulgarian split squats": "https://www.youtube.com/watch?v=2C-uNgKwPLE", "Bulgarian split squats suaves": "https://www.youtube.com/watch?v=2C-uNgKwPLE", "Cossack squats": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Assisted pistol squat": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Eccentric pistol (4s de bajada)": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Pistol squat": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Assisted pistol (accesorio)": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Rotación de muñecas": "https://www.youtube.com/watch?v=5YHZnEsE9hA", "Extensión de muñecas en el piso": "https://www.youtube.com/watch?v=5YHZnEsE9hA", "Círculos de hombros": "https://www.youtube.com/watch?v=5YHZnEsE9hA", "Plank hold ligero": "https://www.youtube.com/watch?v=pSHjTRCQxIw", "Normal push-ups suaves": "https://www.youtube.com/watch?v=yvgp8R0fbWg", "Rotación de muñecas + extensión": "https://www.youtube.com/watch?v=5YHZnEsE9hA", "Protocolo muñecas completo": "https://www.youtube.com/watch?v=5YHZnEsE9hA", "Archer push-ups suaves": "https://www.youtube.com/watch?v=OVRBYrjszy4", "Tobillo + cadera completo": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Cossack squats suaves": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Assisted pistol suave": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Movilidad completa de tobillo y cadera": "https://www.youtube.com/watch?v=5gkYCuTj5EE", "Rotación de tobillos + cadera": "https://www.youtube.com/watch?v=5gkYCuTj5EE"};
+function makeTable(rows) {
+  return `<table class="ex-table">
+    <thead><tr><th>Ejercicio</th><th>Sets</th><th>Reps/Time</th><th>Tempo</th><th>Rest</th></tr></thead>
+    <tbody>${rows.map(r=>`<tr>
+      <td><div class="ex-name">${r.ex}</div><div class="ex-note">${r.note}</div></td>
+      <td>${r.sets}</td><td>${r.reps}</td><td>${r.tempo}</td><td>${r.rest}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+function renderRoutine() {
+  if (!state.levels) return;
+  const pillar = document.getElementById('pillar-select').value;
+  const method = document.getElementById('method-select').value;
+  const level = state.levels[pillar];
+  const routine = ROUTINES[pillar][level];
+  const names = { push:'Push', pull:'Pull', squat:'Squat' };
+  const goals = { push:'One-Arm Push-Up', pull:'Pull-Up', squat:'Pistol Squat' };
+
+  const p = state.profile;
+  let tips = '';
+  if (p.imc) {
+    if (p.imc > 27) tips += `<div class="tip">Con tu IMC (${p.imc.toFixed(1)}): priorizar forma perfecta sobre volumen. No subir de nivel hasta dominar el actual completamente.</div>`;
+    if (p.imc < 20) tips += `<div class="tip">Puedes progresar un poco más rápido — vigilar que no sea usando momentum innecesario.</div>`;
+    if (p.edad > 40) tips += `<div class="tip">Aumentar descansos un 20–30%. El calentamiento completo es obligatorio siempre.</div>`;
+    if (pillar === 'pull' && p.peso > 90) tips += `<div class="tip">Con tu peso (${p.peso}kg), construir base sólida en Passive Hang y Rows antes de negativos. El primer pull-up puede tomar más tiempo — es completamente normal.</div>`;
+    if (pillar === 'squat' && p.altura > 185) tips += `<div class="tip">Tu estatura (${p.altura}cm) genera mayor palanca en el squat. Trabajar movilidad de tobillos y caderas con más énfasis.</div>`;
+  }
+
+  const sch = SCHEDULES[method];
+  const methodDesc = { stacking:'3 días completos (~90 min c/u)', one:'6 días separados por pilar (~30 min c/u)', triplet:'3 días con ejercicios mezclados (~45 min c/u)' };
+  const dayHtml = sch.days.map((d,i) => {
+    const type = sch.types[i];
+    const cls = type==='rest'?'day-rest':type==='all'?'day-all':`day-${type}`;
+    const label = type==='rest'?'—':type==='all'?'P+L+S':type.charAt(0).toUpperCase()+type.slice(1);
+    return `<div class="day-col"><div class="day-name">${d}</div><div class="day-pill ${cls}">${label}</div></div>`;
+  }).join('');
+
+  document.getElementById('routine-output').innerHTML = `
+    <div class="card" style="padding:0;overflow:hidden">
+      <div class="card-header" style="padding:1rem 1.25rem">
+        <span class="card-title">${names[pillar]} — Nivel ${level}/5</span>
+        <span style="font-size:12px;color:var(--text-tertiary)">Objetivo: ${goals[pillar]}</span>
+      </div>
+      <div class="phase-header"><span class="phase-title">Calentamiento</span><span class="badge badge-neutral">~5–10 min</span></div>
+      ${makeTable(routine.warmup)}
+      <div class="phase-header"><span class="phase-title">Rutina principal</span><span class="badge badge-push">Nivel ${level}</span></div>
+      ${makeTable(routine.main)}
+    </div>
+    <div class="card">
+      <div class="card-header"><span class="card-title">Para subir al siguiente nivel</span></div>
+      <div class="criteria-item"><span class="arrow">→</span>${routine.criteria}</div>
+    </div>
+    ${tips}
+    <div class="card">
+      <div class="card-header"><span class="card-title">Calendario semanal</span><span style="font-size:12px;color:var(--text-tertiary)">${methodDesc[method]}</span></div>
+      <div class="schedule-grid">${dayHtml}</div>
+    </div>
+  `;
+}
+
+function updateProfile() {
+  const peso = parseFloat(document.getElementById('peso').value);
+  const altura = parseFloat(document.getElementById('altura').value);
+  const edad = parseInt(document.getElementById('edad').value);
+  if (!peso || !altura) {
+    document.getElementById('profile-metrics').style.display = 'none';
+    document.getElementById('profile-empty').style.display = 'block';
+    return;
+  }
+  const imc = peso / ((altura/100)**2);
+  const pesoIdeal = Math.round(22 * ((altura/100)**2));
+  state.profile = { peso, altura, edad, imc };
+  saveState();
+
+  document.getElementById('profile-metrics').style.display = 'block';
+  document.getElementById('profile-empty').style.display = 'none';
+  document.getElementById('imc-val').textContent = imc.toFixed(1);
+  document.getElementById('peso-ideal-val').textContent = pesoIdeal + ' kg';
+
+  let cat, cls, edadCat;
+  if (imc<18.5){cat='Bajo peso';cls='imc-bajo';}
+  else if(imc<25){cat='Normal';cls='imc-normal';}
+  else if(imc<30){cat='Sobrepeso';cls='imc-sobre';}
+  else{cat='Obesidad';cls='imc-ob';}
+  edadCat = !edad ? '—' : edad<20?'Joven':edad<40?'Adulto':edad<60?'+40':'Senior';
+  document.getElementById('edad-cat-val').textContent = edadCat;
+  document.getElementById('imc-badge').innerHTML = `<span class="imc-badge ${cls}">${cat}</span>`;
+
+  const adjs = [];
+  if (imc>27) adjs.push('No subir de nivel hasta dominar el actual con forma perfecta');
+  if (imc<20) adjs.push('Puede progresar más rápido — vigilar que no sea con momentum');
+  if (edad>40) adjs.push('Aumentar descansos 20–30%. Calentamiento completo siempre');
+  if (edad<20) adjs.push('Sistema nervioso más adaptable — mayor volumen es tolerable');
+  if (peso>90) adjs.push('En Pull: construir base sólida antes de negativos');
+  if (altura>185) adjs.push('En Squat: trabajar movilidad de tobillo y cadera extra');
+  if (!adjs.length) adjs.push('Sin ajustes especiales — perfil estándar');
+  document.getElementById('adj-list').innerHTML = adjs.map(a=>`<div class="adj-item"><span class="adj-dot">•</span>${a}</div>`).join('');
+}
+
+function logSession() {
+  const date = document.getElementById('session-date').value;
+  const pillars = ['push','pull','squat'].filter(p => document.getElementById('log-'+p).checked);
+  if (!pillars.length || !date) return;
+  const notes = document.getElementById('session-notes').value;
+  state.sessions.unshift({ date, pillars, notes });
+  saveState();
+  ['push','pull','squat'].forEach(p => document.getElementById('log-'+p).checked = false);
+  document.getElementById('session-notes').value = '';
+  renderSessions();
+  updateStats();
+}
+
+function renderSessions() {
+  const el = document.getElementById('sessions-history');
+  if (!state.sessions.length) { el.innerHTML = '<div class="empty">No hay sesiones registradas aún</div>'; return; }
+  el.innerHTML = state.sessions.slice(0,20).map(s=>`
+    <div class="session-item">
+      <div>
+        <div style="font-size:13px;font-weight:500">${s.date}</div>
+        ${s.notes?`<div class="session-notes">${s.notes}</div>`:''}
+      </div>
+      <div class="session-badges">${s.pillars.map(p=>`<span class="badge badge-${p}">${p.charAt(0).toUpperCase()+p.slice(1)}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+function updateStats() {
+  document.getElementById('stat-sessions').textContent = state.sessions.length;
+  document.getElementById('stat-volume').textContent = state.sessions.reduce((a,s)=>a+s.pillars.length,0);
+  document.getElementById('stat-streak').textContent = calcStreak();
+}
+
+function calcStreak() {
+  if (!state.sessions.length) return 0;
+  const dates = [...new Set(state.sessions.map(s=>s.date))].sort().reverse();
+  let streak=0, cur=new Date(); cur.setHours(0,0,0,0);
+  for (const d of dates) {
+    const dd=new Date(d); dd.setHours(0,0,0,0);
+    if (Math.round((cur-dd)/86400000)<=1){streak++;cur=dd;}else break;
+  }
+  return streak;
+}
+
+function updateProgressBars() {
+  if (!state.levels) return;
+  const {push,pull,squat} = state.levels;
+  document.getElementById('bar-push').style.width = (push/5*100)+'%';
+  document.getElementById('bar-pull').style.width = (pull/5*100)+'%';
+  document.getElementById('bar-squat').style.width = (squat/5*100)+'%';
+  document.getElementById('bar-push-txt').textContent = `Nivel ${push}/5`;
+  document.getElementById('bar-pull-txt').textContent = `Nivel ${pull}/5`;
+  document.getElementById('bar-squat-txt').textContent = `Nivel ${squat}/5`;
+}
+
+function updateSidebarDots() {
+  if (!state.levels) return;
+  const {push,pull,squat} = state.levels;
+  document.getElementById('sidebar-push-dots').innerHTML = makeMiniDots(push,5,'push');
+  document.getElementById('sidebar-pull-dots').innerHTML = makeMiniDots(pull,5,'pull');
+  document.getElementById('sidebar-squat-dots').innerHTML = makeMiniDots(squat,5,'squat');
+}
+
+function switchTab(id) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.nav-item')[['perfil','test','rutina','progreso'].indexOf(id)].classList.add('active');
+}
+
+// INIT
+loadState();
+document.getElementById('session-date').value = new Date().toISOString().split('T')[0];
+if (state.profile.peso) {
+  document.getElementById('peso').value = state.profile.peso;
+  document.getElementById('altura').value = state.profile.altura;
+  if (state.profile.edad) document.getElementById('edad').value = state.profile.edad;
+  updateProfile();
+}
+if (state.levels) {
+  document.getElementById('routine-no-level').style.display = 'none';
+  document.getElementById('routine-content').style.display = 'block';
+  updateSidebarDots();
+  updateProgressBars();
+}
+renderSessions();
+updateStats();
+</script>
+</body>
+</html>
